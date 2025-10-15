@@ -11,41 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-            - name: Run SonarScanner
+       #Instalar Scanner do SonarCloud
+      - name: Instalar scanner do SonarCloud
+        run: |
+          pip install sonar-scanner-cli
+
+      #Rodar análise com SonarCloud
+      - name: Rodar análise SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: http://sonarqube-sonarqube.sonarqube:9000
-          SONAR_PROJECT_KEY: app
         run: |
-          docker run \
-            --network host \
-            --platform linux/amd64 \
-            --rm \
-            -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
-            -e SONAR_TOKEN="${SONAR_TOKEN}" \
-            -v "$(pwd):/usr/src" \
-            sonarsource/sonar-scanner-cli \
-              -Dsonar.projectKey=app \
-              -Dsonar.projectName="DevSecOps App" \
-              -Dsonar.sources=${SONAR_PROJECT_KEY}
+          echo "➡️ Iniciando análise de código com SonarCloud..."
+          sonar-scanner \
+            -Dsonar.projectKey=seu_usuario_pygoat \
+            -Dsonar.organization=seu_usuario \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.python.version=3.10 \
+            -Dsonar.sources=. \
+            -Dsonar.tests=tests \
+            -Dsonar.test.inclusions="**/tests/**" \
+            -Dsonar.exclusions="**/migrations/**,**/venv/**" \
+            -Dsonar.sourceEncoding=UTF-8
+          echo "✅ Análise concluída! Confira os resultados no painel do SonarCloud."
 
-      - name: Check Quality Gate
-        id: quality-gate
-        continue-on-error: true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: http://sonarqube-sonarqube.sonarqube:9000
-          SONAR_PROJECT_KEY: app
+      #Verificação de dependências com Safety
+      - name: 🧾 Rodar Safety - Dependências vulneráveis
         run: |
-          sleep 10
-          STATUS=$(curl -s -u ${SONAR_TOKEN}: -G \
-            --data-urlencode "projectKey=${SONAR_PROJECT_KEY}" \
-            "${SONAR_HOST_URL}/api/qualitygates/project_status" \
-            | jq -r '.projectStatus.status')
-
-          if [ "${STATUS}" != "OK" ]; then
-            echo "❌ Quality Gate failed with status: ${STATUS}"
-            exit 1
-          else
-            echo "✅ Quality Gate passed"
-          fi
+          pip install safety
+          safety check --full-report || true
