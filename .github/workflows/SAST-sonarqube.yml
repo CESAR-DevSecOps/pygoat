@@ -11,7 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Rodar análise com SonarCloud
+      #Instalar Scanner do SonarCloud
+      - name: Instalar scanner do SonarCloud
+        run: |
+          pip install sonar-scanner-cli
+
+      #Rodar análise com SonarCloud
       - name: Rodar análise SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -29,7 +34,7 @@ jobs:
             -Dsonar.sourceEncoding=UTF-8
           echo "✅ Análise concluída! Confira os resultados no painel do SonarCloud."
 
-      # Verificação de dependências com Safety
+      #Verificação de dependências com Safety
       - name: 🧾 Rodar Safety - Dependências vulneráveis
         run: |
           pip install safety
