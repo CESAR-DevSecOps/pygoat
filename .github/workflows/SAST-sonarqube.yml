@@ -28,8 +28,8 @@ jobs:
         run: |
           echo "➡️ Iniciando análise de código com SonarCloud..."
           sonar-scanner \
-            -Dsonar.projectKey=seu_usuario_pygoat \
-            -Dsonar.organization=seu_usuario \
+            -Dsonar.projectKey=CESAR-DevSecOps_pygoat \
+            -Dsonar.organization=DevSecOps \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.python.version=3.10 \
             -Dsonar.sources=. \
