@@ -1,0 +1,36 @@
+name: 🧪 DevSecOps Educational Pipeline - PyGoat + SonarQube
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  devsecops-sonar:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Rodar análise com SonarCloud
+      - name: Rodar análise SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "➡️ Iniciando análise de código com SonarCloud..."
+          sonar-scanner \
+            -Dsonar.projectKey=seu_usuario_pygoat \
+            -Dsonar.organization=seu_usuario \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.python.version=3.10 \
+            -Dsonar.sources=. \
+            -Dsonar.tests=tests \
+            -Dsonar.test.inclusions="**/tests/**" \
+            -Dsonar.exclusions="**/migrations/**,**/venv/**" \
+            -Dsonar.sourceEncoding=UTF-8
+          echo "✅ Análise concluída! Confira os resultados no painel do SonarCloud."
+
+      # Verificação de dependências com Safety
+      - name: 🧾 Rodar Safety - Dependências vulneráveis
+        run: |
+          pip install safety
+          safety check --full-report || true
