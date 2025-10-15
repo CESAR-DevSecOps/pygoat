@@ -11,11 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-       #Instalar Scanner do SonarCloud
-      - name: Instalar scanner do SonarCloud
-        run: |
-          pip install sonar-scanner-cli
+      #Checkout do código-fonte
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
+      #Configuração do Python
+      - name: Configurar ambiente Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"      
+      
       #Rodar análise com SonarCloud
       - name: Rodar análise SonarCloud
         env:
